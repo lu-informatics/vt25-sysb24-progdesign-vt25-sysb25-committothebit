@@ -74,7 +74,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Database/" />
 	  <Folder Include="Services/" />
 	  <Folder Include="ViewModels/" />
 	  <Folder Include="Views/" />
@@ -85,7 +84,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="App.xaml.cs"/>
+		<Compile Update="App.xaml.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
