@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace Appetite;
+namespace Informatics.Appetite;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Informatics.Appetite.Pages.IngredientsPage"
+             Title="Ingredients">
+    <VerticalStackLayout Padding="15" Spacing="10">
+
+        <!-- Add Ingredient Button -->
+        <Button Text="Add Ingredient"
+                Command="{Binding OpenAddIngredientCommand}"
+                HorizontalOptions="Fill"
+                BackgroundColor="#27AE60"
+                TextColor="White"
+                FontAttributes="Bold"
+                CornerRadius="10"
+                Padding="10"/>
+
+        <!-- CollectionView for Ingredient List -->
+        <CollectionView x:Name="IngredientsList"
+                        ItemsSource="{Binding Ingredients}"
+                        SelectionMode="Single"
+                        VerticalOptions="FillAndExpand"
+                        ItemsUpdatingScrollMode="KeepItemsInView">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="10" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" BackgroundColor="White">
+                        <!-- Ingredient Name -->
+                        <Label Grid.Row="0" Grid.Column="0"
+                               Text="{Binding Name}"
+                               FontAttributes="Bold"
+                               FontSize="18"
+                               AutomationId="IngredientName"
+                               TextColor="Black"
+                               VerticalOptions="Center" />
+                        <!-- Ingredient Quantity -->
+                        <Label Grid.Row="1" Grid.Column="0"
+                               Text="{Binding Category, StringFormat='Category: {0}'}"
+                               FontSize="16"
+                               AutomationId="IngredientCategory"
+                               TextColor="Gray"
+                               VerticalOptions="Center" />
+                        <!-- Tap Gesture for Selecting Ingredient -->
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Path=BindingContext.OpenIngredientDetailsCommand,
+                                                            Source={x:Reference IngredientsList}}"
+                                                  CommandParameter="{Binding Id}"/>
+                        </Grid.GestureRecognizers>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <!-- Empty View -->
+            <CollectionView.EmptyView>
+                <Label Text="No ingredients found."
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       FontSize="16"
+                       FontAttributes="Italic"
+                       TextColor="Gray"/>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

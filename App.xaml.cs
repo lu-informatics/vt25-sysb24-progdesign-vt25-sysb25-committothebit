@@ -1,4 +1,4 @@
-﻿namespace Appetite;
+﻿namespace Informatics.Appetite;
 
 public partial class App : Application
 {

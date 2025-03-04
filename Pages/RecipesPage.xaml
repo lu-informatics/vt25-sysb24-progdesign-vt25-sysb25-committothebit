@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Informatics.Appetite.Pages.RecipesPage"
+             Title="Recipes">
+    <VerticalStackLayout Padding="15" Spacing="10">
+        <!-- Add Recipe Button -->
+        <Button Text="Add Recipe"
+                Command="{Binding OpenAddRecipeCommand}"
+                HorizontalOptions="Fill"
+                BackgroundColor="#27AE60"
+                TextColor="White"
+                FontAttributes="Bold"
+                Padding="12"/>
+
+        <!-- CollectionView for Recipe List -->
+        <CollectionView x:Name="RecipesList"
+                        ItemsSource="{Binding Recipes}"
+                        SelectionMode="None"
+                        VerticalOptions="FillAndExpand"
+                        ItemsUpdatingScrollMode="KeepItemsInView">
+            <!-- Template for each recipe item -->
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Stroke="#E0E0E0" StrokeThickness="1" Padding="10" Margin="5">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                            <!-- Recipe Name -->
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Text="{Binding Name}"
+                                   FontAttributes="Bold"
+                                   FontSize="18"
+                                   AutomationId="RecipeName"
+                                   TextColor="Black"/>
+                            <!-- Recipe Description -->
+                            <Label Grid.Row="1" Grid.Column="0"
+                                   Text="{Binding Description}"
+                                   FontSize="16"
+                                   AutomationId="RecipeDescription"
+                                   TextColor="Gray"/>
+                            <!-- Tap Gesture for Selecting Recipe -->
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Path=BindingContext.OpenRecipeDetailsCommand, Source={x:Reference RecipesList}}"
+                                                      CommandParameter="{Binding Id}"/>
+                            </Grid.GestureRecognizers>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <!-- Empty View -->
+            <CollectionView.EmptyView>
+                <Label Text="No recipes found."
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       FontSize="16"
+                       FontAttributes="Italic"
+                       TextColor="Gray"/>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace Appetite;
+namespace Informatics.Appetite;
 
 public class Program
 {

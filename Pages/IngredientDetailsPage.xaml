@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Informatics.Appetite.ViewModels"
+             x:Class="Informatics.Appetite.Pages.IngredientDetailsPage"
+             x:DataType="viewmodels:IngredientDetailsViewModel"
+             Title="Ingredient Details"
+             BackgroundColor="White">
+    <ScrollView>
+        <VerticalStackLayout Spacing="15"
+                             Padding="20">
+            <!-- Ingredient Details Section -->
+            <Border Stroke="#E0E0E0"
+                    StrokeThickness="1"
+                    Padding="15"
+                    Margin="0,0,0,10">
+                <VerticalStackLayout Spacing="12">
+                    <!-- Ingredient Name -->
+                    <Label Text="Name:"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           TextColor="Black"/>
+                    <Entry Text="{Binding Ingredient.Name, Mode=TwoWay}"
+                           Placeholder="Enter ingredient name"
+                           FontSize="16"
+                           TextColor="Black"
+                           BackgroundColor="#F7F7F7"/>
+                    <!-- Ingredient Quantity -->
+                    <Label Text="Quantity:"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           TextColor="Black"/>
+                    <Entry Text="{Binding Ingredient.Quantity, StringFormat='{0:F2}', Mode=TwoWay}"
+                           Keyboard="Numeric"
+                           Placeholder="Enter quantity"
+                           FontSize="16"
+                           TextColor="Black"
+                           BackgroundColor="#F7F7F7"/>
+                    <!-- Ingredient Unit -->
+                    <Label Text="Unit:"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           TextColor="Black"/>
+                    <Picker ItemsSource="{Binding Units}"
+                            SelectedItem="{Binding Ingredient.Unit, Mode=TwoWay}"
+                            Title="Select unit"
+                            ItemDisplayBinding="{Binding .}"
+                            FontSize="16"
+                            TextColor="Black"
+                            BackgroundColor="#F7F7F7"/>
+                    <!-- Ingredient Diet Tag -->
+                    <Label Text="Diet Tag:"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           TextColor="Black"/>
+                    <Picker ItemsSource="{Binding DietTags}"
+                            SelectedItem="{Binding Ingredient.DietTag, Mode=TwoWay}"
+                            Title="Select diet tag"
+                            ItemDisplayBinding="{Binding .}"
+                            FontSize="16"
+                            TextColor="Black"
+                            BackgroundColor="#F7F7F7"/>
+                    <!-- Associated Recipes -->
+                    <Label Text="Associated Recipes:"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           TextColor="Black"/>
+                    <CollectionView ItemsSource="{Binding Recipes}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding Name}"
+                                       FontSize="16"
+                                       TextColor="Black"/>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+            <!-- Save Changes Button -->
+            <Button Text="Save Changes"
+                    Command="{Binding SaveIngredientCommand}"
+                    BackgroundColor="#4A90E2"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    Padding="12"/>
+            <!-- Delete Button -->
+            <Button Text="Delete"
+                    Command="{Binding DeleteIngredientCommand}"
+                    BackgroundColor="#E74C3C"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    Padding="12"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
