@@ -1,24 +1,34 @@
-﻿namespace Informatics.Appetite;
+﻿using Informatics.Appetite.Pages;
+
+
+namespace Informatics.Appetite;
+
 
 public partial class MainPage : ContentPage
 {
-	int count = 0;
+   public MainPage()
+   {
+       InitializeComponent();
+   }
 
-	public MainPage()
-	{
-		InitializeComponent();
-	}
 
-	private void OnCounterClicked(object sender, EventArgs e)
-	{
-		count++;
+   private async void OnExploreRecipesClicked(object sender, EventArgs e)
+   {
+       await Shell.Current.GoToAsync(nameof(RecipesPage));
 
-		if (count == 1)
-			CounterBtn.Text = $"Clicked {count} time";
-		else
-			CounterBtn.Text = $"Clicked {count} times";
 
-		SemanticScreenReader.Announce(CounterBtn.Text);
-	}
+   }
+
+
+   private async void OnMyIngredientsClicked(object sender, EventArgs e)
+   {
+       await Shell.Current.GoToAsync(nameof(IngredientsPage));
+   }
+
+
+   private async void OnMealPlanClicked(object sender, EventArgs e)
+   {
+       // Lägg till en måltidsplaneringssida när du implementerar den
+       await DisplayAlert("Kommer snart!", "Funktionen för måltidsplanering är under utveckling.", "OK");
+   }
 }
-
