@@ -7,68 +7,70 @@ using Informatics.Appetite.Interfaces;
 using Informatics.Appetite.Services;
 using Informatics.Appetite.ViewModels;
 using Informatics.Appetite.Pages;
-using Informatics.Appetite;
 
 namespace Informatics.Appetite;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			});
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
 
-		//Add appsettings.json as configuration source
-		var assembly = Assembly.GetExecutingAssembly();
-		string appsettingsFileName = "Informatics.Appetite.appsettings.json";
-		using (var stream = assembly.GetManifestResourceStream(appsettingsFileName))
-		{
-			if (stream != null)
-			{
-				builder.Configuration.AddJsonStream(stream);
-			}
-		}
+        // Add appsettings.json as configuration source.
+        var assembly = Assembly.GetExecutingAssembly();
+        string appsettingsFileName = "Informatics.Appetite.appsettings.json";
+        using (var stream = assembly.GetManifestResourceStream(appsettingsFileName))
+        {
+            if (stream != null)
+            {
+                builder.Configuration.AddJsonStream(stream);
+            }
+        }
 
-		//Add database context to the service collection
-		builder.Services.AddDbContext<RecipeContext>(options =>
-		{
-			var connectionString =
-				builder.Configuration.GetConnectionString("AppetiteDatabase");
-			options.UseSqlServer(connectionString);
-		});
+        // Register the RecipeContext with an in-memory database for testing.
+        builder.Services.AddDbContext<RecipeContext>(options =>
+        {
+            var connectionString = builder.Configuration.GetConnectionString("AppetiteDatabase");
+            options.UseSqlServer(connectionString);
+            //options.UseInMemoryDatabase("TestDatabase");        });
+        });
 
-		builder.Services.AddScoped<IIngredientService, IngredientService>();
-		builder.Services.AddScoped<IRecipeService, RecipeService>();
-		builder.Services.AddScoped<IRecipeIngredientService, RecipeIngredientService>();
-		builder.Services.AddScoped<IUserIngredientService, UserIngredientService>();
+        // Register services.
+        builder.Services.AddScoped<IAppUserService, AppUserService>();
+        builder.Services.AddScoped<IIngredientService, IngredientService>();
+        builder.Services.AddScoped<IRecipeService, RecipeService>();
+        builder.Services.AddScoped<IRecipeIngredientService, RecipeIngredientService>();
+        builder.Services.AddScoped<IUserIngredientService, UserIngredientService>();
 
-		//Use Singleton for ViewModels that manage ToListAsync
-		builder.Services.AddSingleton<IngredientsViewModel>();
-		builder.Services.AddSingleton<RecipesViewModel>();
-		builder.Services.AddSingleton<RecipesViewModel>();
+        // Register ViewModels.
+        builder.Services.AddSingleton<IngredientsViewModel>();
+        builder.Services.AddSingleton<RecipesViewModel>();
+        builder.Services.AddScoped<SignInViewModel>();
+        builder.Services.AddTransient<IngredientDetailsViewModel>();
+        builder.Services.AddTransient<RecipeDetailsViewModel>();
 
-		//Use Transient that manage single detail Pages
-		builder.Services.AddTransient<IngredientDetailsViewModel>();
-		builder.Services.AddTransient<RecipeDetailsViewModel>();
-
-		//Register the pages
-		builder.Services.AddSingleton<IngredientsPage>();
-		builder.Services.AddTransient<IngredientDetailsPage>();
-		builder.Services.AddSingleton<RecipesPage>();
-		builder.Services.AddTransient<RecipeDetailsPage>();
-
-
+        // Register Pages.
+        builder.Services.AddSingleton<AppShell>();  // Register AppShell here
+        builder.Services.AddSingleton<SignInPage>();
+        builder.Services.AddSingleton<IngredientsPage>();
+        builder.Services.AddTransient<IngredientDetailsPage>();
+        builder.Services.AddSingleton<RecipesPage>();
+        builder.Services.AddTransient<RecipeDetailsPage>();
 
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
-		return builder.Build();
-	}
+        var app = builder.Build();
+        // Assign the DI container to our static property.
+        App.Container = app.Services;
+        return app;
+    }
 }

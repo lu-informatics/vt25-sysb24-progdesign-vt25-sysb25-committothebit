@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Informatics.Appetite.Pages.SignInPage"
+             NavigationPage.HasBackButton="False"
+             Title="Sign In">
+
+    <VerticalStackLayout Padding="30" Spacing="15" VerticalOptions="Center">
+
+        <!-- Username Entry -->
+        <Entry x:Name="UsernameEntry"
+               Placeholder="Enter username"
+               Text="{Binding Username}"
+               Keyboard="Text"
+               AutomationId="UsernameEntry"/>
+
+        <!-- Password Entry -->
+        <Entry x:Name="PasswordEntry"
+               Placeholder="Enter password"
+               Text="{Binding Password}"
+               IsPassword="True"
+               AutomationId="PasswordEntry"/>
+
+        <!-- Create Account Toggle -->
+        <HorizontalStackLayout>
+           <Label Text="Create account" VerticalOptions="Center" Padding="0,0,10,0"/>
+           <Switch IsToggled="{Binding IsCreateAccount}" AutomationId="CreateAccountToggle"/>
+        </HorizontalStackLayout>
+
+        <!-- Sign-In/Create Account Button -->
+        <Button Text="{Binding SignInButtonText}"
+                Command="{Binding SignInCommand}"
+                BackgroundColor="#27AE60"
+                TextColor="White"
+                CornerRadius="10"
+                Padding="10"
+                AutomationId="SignInButton"/>
+
+        <!-- Error Message -->
+        <Label x:Name="ErrorMessage"
+               Text="{Binding ErrorMessage}"
+               TextColor="Red"
+               FontAttributes="Bold"
+               IsVisible="{Binding IsErrorVisible}"
+               HorizontalOptions="Center"/>
+    </VerticalStackLayout>
+
+</ContentPage>
