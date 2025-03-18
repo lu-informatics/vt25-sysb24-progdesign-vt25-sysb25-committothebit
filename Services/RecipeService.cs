@@ -71,22 +71,22 @@ public class RecipeService : IRecipeService
     }
 
     public async Task<List<string>> GetDifficultyLevelsAsync()
-{
-    return await _context.Recipes
-                         .Where(r => r.DifficultyLevel != null)
-                         .Select(r => r.DifficultyLevel!)
-                         .Distinct()
-                         .ToListAsync();
-}
+    {
+        return await _context.Recipes
+                             .Where(r => r.DifficultyLevel != null)
+                             .Select(r => r.DifficultyLevel!)
+                             .Distinct()
+                             .ToListAsync();
+    }
 
     public async Task<List<string>> GetCookingTimesAsync()
-{
-    return await _context.Recipes
-                         .Select(r => r.CookingTime.ToString())
-                         .Distinct()
-                         .OrderBy(time => time)
-                         .ToListAsync();
-}
+    {
+        return await _context.Recipes
+                             .Select(r => r.CookingTime.ToString())
+                             .Distinct()
+                             .OrderBy(time => time)
+                             .ToListAsync();
+    }
     public async Task<List<string>> GetDietTagsAsync()
         {
             // This assumes you have access to RecipeIngredients and each RecipeIngredient includes its Ingredient.
@@ -99,15 +99,15 @@ public class RecipeService : IRecipeService
         }
 
     public async Task<List<string>> GetCategoriesAsync()
-{
-    // This will pull categories from the ingredients that are associated with recipes.
-    var categories = await _context.RecipeIngredients
-         .Include(ri => ri.Ingredient)
-         .Select(ri => ri.Ingredient.Category)
-         .Distinct()
-         .ToListAsync();
-    return categories;
-}
+    {
+        // This will pull categories from the ingredients that are associated with recipes.
+        var categories = await _context.RecipeIngredients
+             .Include(ri => ri.Ingredient)
+             .Select(ri => ri.Ingredient.Category)
+             .Distinct()
+             .ToListAsync();
+        return categories;
+    }
 
 
     public async Task<bool> DeleteRecipeByNameAsync(string name)

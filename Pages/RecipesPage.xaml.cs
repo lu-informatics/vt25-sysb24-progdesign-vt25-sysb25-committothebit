@@ -11,31 +11,34 @@ public partial class RecipesPage : ContentPage
     }
 
     private void OnDifficultyIconTapped(object sender, EventArgs e)
-{
-    DifficultyPicker.Focus();
-}
+    {
+        DifficultyPicker.Focus();
+    }
      private void OnCookingTimeIconTapped(object sender, EventArgs e)
-{
-   CookingTimePicker.Focus();
-}
+    {
+       CookingTimePicker.Focus();
+    }
 
     private void OnDietTagIconTapped(object sender, EventArgs e)
-{
-    DietTagPicker.Focus();
-}
+    {
+        DietTagPicker.Focus();
+    }
 
     private void OnCategoryIconTapped(object sender, EventArgs e)
-{
-    CategoryPicker.Focus();
-}
+    {
+        CategoryPicker.Focus();
+    }
 
 
 
     protected override async void OnNavigatedTo(NavigatedToEventArgs args)
-{
-    base.OnNavigatedTo(args);
-    var viewModel = BindingContext as RecipesViewModel;
-    viewModel?.RefreshCommand.Execute(null);
-}
+    {
+        base.OnNavigatedTo(args);
+        if (BindingContext is RecipesViewModel viewModel)
+        {
+            await viewModel.InitializeAsync();
+        }
+    }
+
 
 }

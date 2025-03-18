@@ -131,10 +131,7 @@ namespace Informatics.Appetite.Services
             var hashedInput = HashPassword(password, user.Salt, Iterations, HashSize);
             if (user.PasswordHash.SequenceEqual(hashedInput))
             {
-                // Store the authenticated user
-                _currentUser = user;
-                _currentUserId = user.Id;
-                _isAuthenticated = true;
+                SetCurrentUser(user);
                 return user;
             }
             return null;

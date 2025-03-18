@@ -53,17 +53,18 @@ public partial class RecipesViewModel : BaseViewModel
         }
     }
     private string _selectedCategory = "Category";
-public string SelectedCategory
-{
-    get => _selectedCategory;
-    set
+    public string SelectedCategory
     {
-        if (SetProperty(ref _selectedCategory, value))
+        get => _selectedCategory;
+        set
         {
-            FilterRecipes();
+            if (SetProperty(ref _selectedCategory, value))
+            {
+                FilterRecipes();
+            }
         }
     }
-}
+
     private string _selectedDietTag = "Diet tag";
         public string SelectedDietTag
         {
@@ -92,12 +93,16 @@ public string SelectedCategory
         RefreshCommand = new AsyncRelayCommand(LoadRecipesAsync);
         OpenRecipeDetailsCommand = new RelayCommand<int>(OpenRecipeDetails);
         OpenAddRecipeCommand = new RelayCommand(OpenAddRecipe);
-        
-        _ = LoadRecipesAsync();
-        _ = LoadDifficultyLevelsAsync();
-        _ = LoadCookingTimesAsync();
-        _ = LoadDietTagsAsync();
-        _ = LoadCategoriesAsync();
+    }
+    public async Task InitializeAsync()
+    {
+        await LoadDifficultyLevelsAsync();
+        await LoadCookingTimesAsync();
+        await LoadDietTagsAsync();
+        await LoadCategoriesAsync();
+        await LoadRecipesAsync();
+
+        await LoadRecipesAsync();
     }
 
     public async Task LoadRecipesAsync()
@@ -152,23 +157,74 @@ public string SelectedCategory
             IsBusy = false;
             Debug.WriteLine("LoadRecipesAsync: Completed");
         }
+
+        //// Also load Difficulty & CookingTime pickers here, awaited
+        //await LoadDifficultyLevelsAsync();
+        //await LoadCookingTimesAsync();
+        //await LoadDietTagsAsync();
+        //await LoadCategoriesAsync();
     }
 
     private void FilterRecipes()
     {
-        try 
+        var filtered = Recipes.Where(r =>
         {
-            // Just copy all recipes to filtered recipes for debugging
-            FilteredRecipes.Clear();
-            foreach (var recipe in Recipes)
+            // Existing filters: search, difficulty, cooking time, and diet
+            bool matchesSearch = string.IsNullOrWhiteSpace(SearchText) || r.Name.ToLower().Contains(SearchText.ToLower());
+            bool matchesDifficulty = string.IsNullOrWhiteSpace(SelectedDifficulty) || SelectedDifficulty == "Difficulty" ||
+                (r.DifficultyLevel != null && r.DifficultyLevel.Equals(SelectedDifficulty, StringComparison.OrdinalIgnoreCase));
+            bool matchesCookingTime = string.IsNullOrWhiteSpace(SelectedCookingTime) || SelectedCookingTime == "Cooking time" ||
+                r.CookingTime.ToString() == SelectedCookingTime;
+
+            bool matchesDiet = true;
+            if (!string.IsNullOrWhiteSpace(SelectedDietTag) && SelectedDietTag != "Diet tag")
             {
-                FilteredRecipes.Add(recipe);
+                var recipeDietTags = r.RecipeIngredients
+                    .Select(ri => ri.Ingredient?.DietTag)
+                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                    .Distinct()
+                    .ToList();
+
+                if (SelectedDietTag.Equals("Non-Vegetarian", StringComparison.OrdinalIgnoreCase))
+                {
+                    matchesDiet = true;
+                }
+                else if (SelectedDietTag.Equals("Pescatarian", StringComparison.OrdinalIgnoreCase))
+                {
+                    matchesDiet = !recipeDietTags.Any(tag => tag.Equals("Non-Vegetarian", StringComparison.OrdinalIgnoreCase));
+                }
+                else if (SelectedDietTag.Equals("Vegetarian", StringComparison.OrdinalIgnoreCase))
+                {
+                    matchesDiet = !recipeDietTags.Any(tag =>
+                        tag.Equals("Non-Vegetarian", StringComparison.OrdinalIgnoreCase) ||
+                        tag.Equals("Pescatarian", StringComparison.OrdinalIgnoreCase));
+                }
+                else if (SelectedDietTag.Equals("Vegan", StringComparison.OrdinalIgnoreCase))
+                {
+                    matchesDiet = !recipeDietTags.Any(tag =>
+                        tag.Equals("Non-Vegetarian", StringComparison.OrdinalIgnoreCase) ||
+                        tag.Equals("Pescatarian", StringComparison.OrdinalIgnoreCase) ||
+                        tag.Equals("Vegetarian", StringComparison.OrdinalIgnoreCase));
+                }
             }
-            Debug.WriteLine($"FilterRecipes: Added {FilteredRecipes.Count} recipes");
-        }
-        catch (Exception ex)
+
+            // New filter: Category filtering
+            bool matchesCategory = true;
+            if (!string.IsNullOrWhiteSpace(SelectedCategory) && SelectedCategory != "Category")
+            {
+                // Check if any ingredient in the recipe has the selected category.
+                matchesCategory = r.RecipeIngredients.Any(ri =>
+                    ri.Ingredient != null &&
+                    ri.Ingredient.Category.Equals(SelectedCategory, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return matchesSearch && matchesDifficulty && matchesCookingTime && matchesDiet && matchesCategory;
+        }).ToList();
+
+        FilteredRecipes.Clear();
+        foreach (var recipe in filtered)
         {
-            Debug.WriteLine($"ERROR in FilterRecipes: {ex.Message}");
+            FilteredRecipes.Add(recipe);
         }
     }
 
