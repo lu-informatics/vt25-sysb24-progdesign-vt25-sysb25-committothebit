@@ -72,43 +72,34 @@ public class UserIngredientService : IUserIngredientService
         Debug.WriteLine($"SaveUserIngredientAsync: Starting with User={userIngredient.AppUserId}, Ingredient={userIngredient.IngredientId}");
         try
         {
-            // First, check if an entity with the same key is already tracked locally.
+            // Clear any tracked entity first
             var localEntity = _context.UserIngredients.Local
                 .FirstOrDefault(ui => ui.AppUserId == userIngredient.AppUserId && ui.IngredientId == userIngredient.IngredientId);
-
             if (localEntity != null)
             {
-                Debug.WriteLine($"SaveUserIngredientAsync: Updating tracked entity, old amount: {localEntity.Amount}, new amount: {userIngredient.Amount}");
-                // Update the tracked entity directly.
-                localEntity.Amount = userIngredient.Amount;
-                // Use the tracked entity for saving.
-                userIngredient = localEntity;
+                _context.Entry(localEntity).State = EntityState.Detached;
+            }
+
+            // Check if entity exists in database
+            var existingUserIngredient = await _context.UserIngredients
+                .AsNoTracking()
+                .FirstOrDefaultAsync(ui => ui.AppUserId == userIngredient.AppUserId && ui.IngredientId == userIngredient.IngredientId);
+
+            if (existingUserIngredient != null)
+            {
+                Debug.WriteLine($"SaveUserIngredientAsync: Updating existing entry");
+                _context.UserIngredients.Attach(userIngredient);
+                _context.Entry(userIngredient).State = EntityState.Modified;
             }
             else
             {
-                // Entity is not tracked locally; check if it exists in the database.
-                var existingUserIngredient = await _context.UserIngredients
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(ui => ui.AppUserId == userIngredient.AppUserId && ui.IngredientId == userIngredient.IngredientId);
-
-                if (existingUserIngredient != null)
-                {
-                    Debug.WriteLine($"SaveUserIngredientAsync: Existing entry found in DB. Attaching and marking as modified.");
-                    // Attach the new instance and mark it as modified.
-                    _context.UserIngredients.Attach(userIngredient);
-                    _context.Entry(userIngredient).State = EntityState.Modified;
-                }
-                else
-                {
-                    Debug.WriteLine($"SaveUserIngredientAsync: No existing entry found. Adding new entry.");
-                    _context.UserIngredients.Add(userIngredient);
-                }
+                Debug.WriteLine($"SaveUserIngredientAsync: Adding new entry");
+                _context.UserIngredients.Add(userIngredient);
             }
 
             await _context.SaveChangesAsync();
             Debug.WriteLine($"SaveUserIngredientAsync: Changes saved to database");
 
-            // Return a fresh copy from the database (if needed).
             return await GetUserIngredientAsync(userIngredient.AppUserId, userIngredient.IngredientId);
         }
         catch (Exception ex)
